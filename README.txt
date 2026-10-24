@@ -1,4 +1,4 @@
-DBZ Vault Android 0.10 — price updates and duplicate quantities
+DBZ Vault Android 0.11 — simple eBay searches
 
 CameraX scanner, gallery scanning and seven-star icon are retained.
 Automatic pricing: exact English Masters, Fusion World and Panini matches from TCGplayer Market via TCGCSV, converted from USD to AUD using Frankfurter reference rates. The provider snapshot is updated daily by GitHub Actions. The app checks its own hosted feed at most daily and retains the last working prices offline.
@@ -7,7 +7,7 @@ Manual vintage prices remain unchanged and take priority. Unsupported cards, alt
 
 The optional catalogue audit and artwork-index panels are hidden; the native camera scanner does not depend on them. Native Android file saving is available for collection backup and CSV exports. Status-bar insets prevent the header from overlapping phone indicators.
 
-Build source: DBZ-Vault-GitHub-APK-Build-Ready.zip. Package com.dbzvault.collector.nativescan, version code 10. Uses the same development signing key as versions 0.4 and 0.5, allowing installation as an update without removing collection data.
+Build source: DBZ-Vault-GitHub-APK-Build-Ready.zip. Package com.dbzvault.collector.nativescan, version code 11. Uses the same development signing key as versions 0.4 and 0.5, allowing installation as an update without removing collection data.
 
 Validation: JavaScript syntax and scanner tests; price-matching and manual-override tests; Android lint and APK compilation. Physical-device verification is still required for updated Android UI integrations.
 
@@ -25,3 +25,5 @@ Automatic adding: a unique exact printed-number match of 100 saves one card imme
 0.9: replace the expanded price research queue with Update card prices. A user-initiated update bypasses the automatic daily check interval and retrieves the latest hosted snapshot, automatically revaluing matching binder entries and portfolio totals. Shows a compact result rather than individual research rows. Manual values remain authoritative; unsupported/vintage cards remain manual. Offline failures retain the last valid prices and show a clear status. Scanner startup fix and Android camera launch tests are retained.
 
 0.10: each new exact duplicate scan increments the existing finish quantity and the top-left quantity badge. The same photo can only contribute one copy, including when OCR is retried. Undo restores the previous count. Choosing a different finish moves the just-scanned copy rather than counting it again. If multiple finishes exist, selection is required before counting the copy. Manual values, condition, notes and purchase data are preserved when quantities increase.
+
+0.11: all eBay price research links now search only DBZ followed by the card code, e.g. DBZ BT2-001. Completed/sold listing filters remain enabled. Card-detail buttons, manual research links and research exports use the same query. Existing automatic market prices, duplicate quantity counters and scanner fixes are retained.
