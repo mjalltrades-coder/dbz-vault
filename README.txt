@@ -1,4 +1,4 @@
-DBZ Vault Android 0.7 — automatic binder prices and Samsung safe areas
+DBZ Vault Android 0.8 — scanner startup fix
 
 CameraX scanner, gallery scanning and seven-star icon are retained.
 Automatic pricing: exact English Masters, Fusion World and Panini matches from TCGplayer Market via TCGCSV, converted from USD to AUD using Frankfurter reference rates. The provider snapshot is updated daily by GitHub Actions. The app checks its own hosted feed at most daily and retains the last working prices offline.
@@ -7,7 +7,7 @@ Manual vintage prices remain unchanged and take priority. Unsupported cards, alt
 
 The optional catalogue audit and artwork-index panels are hidden; the native camera scanner does not depend on them. Native Android file saving is available for collection backup and CSV exports. Status-bar insets prevent the header from overlapping phone indicators.
 
-Build source: DBZ-Vault-GitHub-APK-Build-Ready.zip. Package com.dbzvault.collector.nativescan, version code 7. Uses the same development signing key as versions 0.4 and 0.5, allowing installation as an update without removing collection data.
+Build source: DBZ-Vault-GitHub-APK-Build-Ready.zip. Package com.dbzvault.collector.nativescan, version code 8. Uses the same development signing key as versions 0.4 and 0.5, allowing installation as an update without removing collection data.
 
 Validation: JavaScript syntax and scanner tests; price-matching and manual-override tests; Android lint and APK compilation. Physical-device verification is still required for updated Android UI integrations.
 
@@ -19,3 +19,5 @@ Portfolio layout: dark dashboard with large AUD value, most-valuable cards, rece
 0.7 changes: recognise combined front/back leader names and Parallel Foil market subtypes, preserve exact set and artwork checks. Existing binder entries receive matching prices without re-scanning. New matcher versions rebuild the feed even when the source date is unchanged. Updated bundled prices supersede old cached matching data. Manual values keep priority. WebView now sits inside an inset-aware native container, keeping fixed headers, bottom navigation, card dialogs and scanner controls clear of status/navigation bars and keyboard.
 
 Automatic adding: a unique exact printed-number match of 100 saves one card immediately, with Undo. Repeated scans do not increment quantity. Ambiguous codes and corrected/fuzzy readings remain suggestions. New entries keep finish Not set until Normal/Foil is chosen; this moves the entry instead of adding a second card. No reflective finish is inferred from glare. Reviewed original BT2-001 and BT1-031 standard holographic products can use their exact TCGplayer Normal-labelled product prices, explicitly disclosed in source details; no general cross-finish fallback is used.
+
+0.8: native scanner uses its original window startup path, with scanner-specific safe-area padding installed after setContentView. The WebView retains its separate safe-area container. Android instrumentation checks open/reopen the camera and open it through the scan tab and JavaScript bridge.
