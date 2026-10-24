@@ -28,7 +28,14 @@ jobs:
       - name: Restore the last good price snapshot
         run: |
           if git show-ref --verify --quiet refs/remotes/origin/price-data; then
-            git show origin/price-data:prices.json > android-project/app/src/main/assets/market-prices.json
+            git show origin/price-data:prices.json > "$RUNNER_TEMP/previous-prices.json"
+            python3 - "$RUNNER_TEMP/previous-prices.json" android-project/app/src/main/assets/market-prices.json <<'PY'
+          import json,sys,datetime
+          from pathlib import Path
+          old,new=map(Path,sys.argv[1:]);prior=json.loads(old.read_text());bundled=json.loads(new.read_text())
+          stamp=lambda x:datetime.datetime.fromisoformat(x['updated'].replace('Z','+00:00'))
+          if prior.get('matcherVersion',1)>=bundled.get('matcherVersion',1) and stamp(prior)>=stamp(bundled):new.write_text(old.read_text())
+          PY
           fi
       - name: Check scanner and price matching
         working-directory: android-project
@@ -36,6 +43,7 @@ jobs:
           node tests/recognition.test.cjs
           node tests/market.test.cjs
           node tests/portfolio.test.cjs
+          node tests/website-pricing.test.cjs
           python3 -m unittest discover -s tests -p 'test_*.py'
       - name: Refresh daily market prices
         working-directory: android-project
