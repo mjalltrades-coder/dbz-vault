@@ -76,6 +76,32 @@ jobs:
         if: github.event_name != 'schedule'
         working-directory: android-project
         run: gradle --no-daemon --stacktrace testDebugUnitTest lintDebug assembleDebug
+      - name: Enable Android emulator acceleration
+        if: github.event_name != 'schedule'
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Open scanner and verify camera frames on Android
+        if: github.event_name != 'schedule'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back emulated
+          script: gradle -p android-project --no-daemon connectedDebugAndroidTest
+      - name: Save Android test reports
+        if: always() && github.event_name != 'schedule'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Android-scanner-launch-tests
+          path: |
+            android-project/app/build/reports/androidTests/
+            android-project/app/build/outputs/androidTest-results/
+          if-no-files-found: ignore
       - name: Verify and name APK
         if: github.event_name != 'schedule'
         run: |
