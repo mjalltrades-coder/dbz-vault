@@ -26,14 +26,17 @@ jobs:
           gradle-version: '8.9'
       - name: Install Android SDK 35
         run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Check card recognition
+        working-directory: android-project
+        run: node tests/recognition.test.cjs
       - name: Build installable debug APK
         working-directory: android-project
-        run: gradle --no-daemon --stacktrace assembleDebug
+        run: gradle --no-daemon --stacktrace testDebugUnitTest lintDebug assembleDebug
       - name: Name APK
-        run: cp android-project/app/build/outputs/apk/debug/app-debug.apk DBZ-Vault.apk
+        run: cp android-project/app/build/outputs/apk/debug/app-debug.apk DBZ-Vault-Native-Scan.apk
       - uses: actions/upload-artifact@v4
         with:
           name: DBZ-Vault-Android-APK
-          path: DBZ-Vault.apk
+          path: DBZ-Vault-Native-Scan.apk
           if-no-files-found: error
           retention-days: 30
