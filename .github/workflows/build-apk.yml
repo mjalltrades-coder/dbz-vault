@@ -21,6 +21,10 @@ jobs:
           fetch-depth: 0
       - name: Unpack Android project
         run: unzip -q DBZ-Vault-GitHub-APK-Build-Ready.zip -d android-project
+      - name: Restore existing development signing key
+        run: |
+          git show 18964351ead1127b68013136ae659e868f519987:DBZ-Vault-GitHub-APK-Build-Ready.zip > "$RUNNER_TEMP/prior-vault-source.zip"
+          unzip -p "$RUNNER_TEMP/prior-vault-source.zip" debug.keystore > android-project/debug.keystore
       - name: Restore the last good price snapshot
         run: |
           if git show-ref --verify --quiet refs/remotes/origin/price-data; then
