@@ -57,7 +57,7 @@ jobs:
           html.write_text(page)
           gradle = root / 'app/build.gradle'
           build = gradle.read_text()
-          old = "versionCode 139; versionName '1.39-video-only'"
+          old = "versionCode 137; versionName '1.37-temporary-video'"
           assert old in build, 'Expected v1.37 version not found'
           gradle.write_text(build.replace(old, "versionCode 139; versionName '1.39-video-only'", 1))
           readme = root / 'README.txt'
