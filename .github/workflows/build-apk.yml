@@ -47,17 +47,21 @@ jobs:
           old = 'animation:splash-auto-dismiss 6s ease 1 both'
           assert old in page, 'Expected CSS splash timer not found'
           page = page.replace(old, 'animation:none', 1)
+          old = '#launch-splash .splash-glow,#launch-splash .splash-energy-rays,#launch-splash .splash-shockwave,#launch-splash .splash-particles,#launch-splash .splash-3d,#launch-splash .splash-head-flight,#launch-splash .splash-ball{display:none!important}'
+          new = '#launch-splash .splash-glow,#launch-splash .splash-energy-rays,#launch-splash .splash-shockwave,#launch-splash .splash-particles,#launch-splash .splash-3d,#launch-splash .splash-dragon-motion,#launch-splash .splash-art,#launch-splash .splash-head-flight,#launch-splash .splash-ball,#launch-splash .splash-vignette,#launch-splash .splash-center{display:none!important}'
+          assert old in page, 'Expected legacy splash artwork not found'
+          page = page.replace(old, new, 1)
           old = 'const delay=reduced?500:2750;'
           assert old in page, 'Expected JS splash timer not found'
           page = page.replace(old, 'const delay=5200;', 1)
           html.write_text(page)
           gradle = root / 'app/build.gradle'
           build = gradle.read_text()
-          old = "versionCode 137; versionName '1.37-temporary-video'"
+          old = "versionCode 139; versionName '1.39-video-only'"
           assert old in build, 'Expected v1.37 version not found'
-          gradle.write_text(build.replace(old, "versionCode 138; versionName '1.38-loading-video-fix'", 1))
+          gradle.write_text(build.replace(old, "versionCode 139; versionName '1.39-video-only'", 1))
           readme = root / 'README.txt'
-          readme.write_text(readme.read_text() + '\nVersion 1.38 fixes native WebView serving of loading-video.mp4 (video/mp4, binary response) and keeps the splash visible for the full 5.2-second clip.\n')
+          readme.write_text(readme.read_text() + '\nVersion 1.39 hides leftover splash artwork so the loading video appears without the old animation bleeding through.\n')
           PY
       - name: Restore existing development signing key
         run: |
