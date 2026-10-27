@@ -8,6 +8,7 @@ on:
     paths:
       - DBZ-Vault-GitHub-APK-Build-Ready.zip.partaa
       - DBZ-Vault-GitHub-APK-Build-Ready.zip.partab
+      - .github/workflows/build-apk.yml
 permissions:
   contents: write
 concurrency:
@@ -25,6 +26,39 @@ jobs:
         run: cat DBZ-Vault-GitHub-APK-Build-Ready.zip.partaa DBZ-Vault-GitHub-APK-Build-Ready.zip.partab > DBZ-Vault-GitHub-APK-Build-Ready.zip
       - name: Unpack Android project
         run: unzip -q DBZ-Vault-GitHub-APK-Build-Ready.zip -d android-project
+      - name: Fix loading video delivery and launch duration
+        if: github.event_name != 'schedule'
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          root = Path('android-project')
+          java = root / 'app/src/main/java/com/dbzvault/collector/MainActivity.java'
+          source = java.read_text()
+          old = '"dragon-intro-atlas.webp","dragon-intro-frame.webp").contains(name)) return null;'
+          new = '"dragon-intro-atlas.webp","dragon-intro-frame.webp","loading-video.mp4").contains(name)) return null;'
+          assert old in source, 'Expected WebView asset allowlist not found'
+          source = source.replace(old, new, 1)
+          old = 'String mime=name.endsWith(".css")?"text/css":name.endsWith(".js")?"application/javascript":name.endsWith(".json")||name.endsWith(".webmanifest")?"application/json":name.endsWith(".webp")?"image/webp":"text/html";\n            return new WebResourceResponse(mime,"UTF-8",in);'
+          new = 'String mime=name.endsWith(".mp4")?"video/mp4":name.endsWith(".css")?"text/css":name.endsWith(".js")?"application/javascript":name.endsWith(".json")||name.endsWith(".webmanifest")?"application/json":name.endsWith(".webp")?"image/webp":"text/html";\n            return new WebResourceResponse(mime,name.endsWith(".mp4")?null:"UTF-8",in);'
+          assert old in source, 'Expected WebView MIME response not found'
+          java.write_text(source.replace(old, new, 1))
+          html = root / 'app/src/main/assets/index.html'
+          page = html.read_text()
+          old = 'animation:splash-auto-dismiss 6s ease 1 both'
+          assert old in page, 'Expected CSS splash timer not found'
+          page = page.replace(old, 'animation:none', 1)
+          old = 'const delay=reduced?500:2750;'
+          assert old in page, 'Expected JS splash timer not found'
+          page = page.replace(old, 'const delay=5200;', 1)
+          html.write_text(page)
+          gradle = root / 'app/build.gradle'
+          build = gradle.read_text()
+          old = "versionCode 137; versionName '1.37-temporary-video'"
+          assert old in build, 'Expected v1.37 version not found'
+          gradle.write_text(build.replace(old, "versionCode 138; versionName '1.38-loading-video-fix'", 1))
+          readme = root / 'README.txt'
+          readme.write_text(readme.read_text() + '\nVersion 1.38 fixes native WebView serving of loading-video.mp4 (video/mp4, binary response) and keeps the splash visible for the full 5.2-second clip.\n')
+          PY
       - name: Restore existing development signing key
         run: |
           git show 18964351ead1127b68013136ae659e868f519987:DBZ-Vault-GitHub-APK-Build-Ready.zip > "$RUNNER_TEMP/prior-vault-source.zip"
